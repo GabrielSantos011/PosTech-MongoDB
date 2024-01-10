@@ -8,12 +8,18 @@
 
 - Mostrar coleções: ```show collections```
 
-- Quantos documentos tem a coleção: ```db.nomeCollection.countDocuments()```
+- Deletar uma coleção: ```db.nomeCollection.drop()```
 
-- Listar todos os documentos da coleção: ```db.nomeCollection.find()```
+- Deletar um banco (deve estar conectado no mesmo): ```db.dropDatabase()```
 
 - Inserir documento: ```db.nomeCollection.insertOne({"chave": "campo","chave": campo})```
 	obs: mongodb cria automaticamente um id (como se fosse uma chave primaria)
+
+- Inserir mais de um documento: ```db.nomeCollection.insertMany([{"chave": "campo","chave": campo}, {"chave": "campo","chave": campo}])```
+
+- Quantos documentos tem a coleção: ```db.nomeCollection.countDocuments()```
+
+- Listar todos os documentos da coleção: ```db.nomeCollection.find()```
 
 - listagem mais detalhada:
 ```
