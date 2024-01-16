@@ -32,8 +32,6 @@
       		```
       	- Para limitarmos a consulta usamos o método limit, exemplo (apenas os 5 primeiros registros): ```db.nomeCollection.find().limit(5)```
       	- Para ordenarmos a consulta utilizamos o método sort (1 para ordem crescente e -1 para decrescente), exemplo ```db.nomeCollection.find().sort({campo: 1})```
-      	- elementos ignorados
-      	- collation
 
 	- Operadores:
   	```
@@ -53,3 +51,11 @@
 	
   	Para comparar arrays: $all: []
   	```
+
+- Atualizar um único documento: ```db.nomeCollection.updateOne({condição},{$set: {campo: novo valor}})``` (pode ser utilizado para atualizar um campo existente ou criar um novo campo dentro da coleção)
+
+- Atualizar mais de um documento: ```db.nomeCollection.updateMany({"Campo":{$in:["xxxxxxxxxx", "yyyyyyy"]}},{$set: {"Campo": "Novo valor"}})``` 
+
+- Excluir um documento: ```db.db.nomeCollection.deleteOne({condição})```
+
+- - Excluir mais de um documento: ```db.db.nomeCollection.deleteMany({condição})```
