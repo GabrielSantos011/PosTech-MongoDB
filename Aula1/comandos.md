@@ -21,7 +21,35 @@
 
 - Listar todos os documentos da coleção: ```db.nomeCollection.find()```
 
-- listagem mais detalhada:
-```
-db.nomeCollection.find({condição (pode ser vazia),{"_id": 0 (0 n mostra id e 1 mostra só o id)}})
-```
+- Como filtrar consultas no find:
+	- O primeiro jogo de chaves é onde colocamos as condições, exemplo: ```{campo: {$gt: 20}}```
+ 	- O segundo jogo de chaves é o de projeção (indica qual campo aparece ou não na consulta onde 1 é true e 0 é false - o id sempre aparece a menos que deixe explícito que não deve aparecer)
+  		- exemplos:
+      		```
+      		{campo: 1}        -> aparece o campo e o id
+      		{campo: 1, _id:0} -> aparece somente o campo
+      		{campo: 0}        -> aparece todos menos o campo
+      		```
+      	- Para limitarmos a consulta usamos o método limit, exemplo (apenas os 5 primeiros registros): ```db.nomeCollection.find().limit(5)```
+      	- Para ordenarmos a consulta utilizamos o método sort (1 para ordem crescente e -1 para decrescente), exemplo ```db.nomeCollection.find().sort({campo: 1})```
+      	- elementos ignorados
+      	- collation
+
+	- Operadores:
+  	```
+  	==     ->    $eq
+  	!=     ->    $ne
+  	>      ->    $gt
+  	>=     ->    $gte
+  	<      ->    $lt
+  	<=     ->    $lte
+  	in()   ->    $in[]
+  	!in()  ->    $nin[]
+ 	 
+  	$not[{}]
+  	$and[{},{}]
+  	$or[{},{}]
+  	$nor[{},{}]
+	
+  	Para comparar arrays: $all: []
+  	```
