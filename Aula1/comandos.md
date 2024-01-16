@@ -58,4 +58,4 @@
 
 - Excluir um documento: ```db.db.nomeCollection.deleteOne({condição})```
 
-- - Excluir mais de um documento: ```db.db.nomeCollection.deleteMany({condição})```
+- Excluir mais de um documento: ```db.db.nomeCollection.deleteMany({condição})```
