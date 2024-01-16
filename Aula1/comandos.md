@@ -23,15 +23,19 @@
 
 - Como filtrar consultas no find:
 	- O primeiro jogo de chaves é onde colocamos as condições, exemplo: ```{campo: {$gt: 20}}```
- 	- O segundo jogo de chaves é o de projeção (indica qual campo aparece ou não na consulta onde 1 é true e 0 é false - o id sempre aparece a menos que deixe explícito que não deve aparecer)
+  	- O segundo jogo de chaves é o de projeção (indica qual campo aparece ou não na consulta onde 1 é true e 0 é false - o id sempre aparece a menos que deixe explícito que não deve aparecer)
   		- exemplos:
       		```
       		{campo: 1}        -> aparece o campo e o id
       		{campo: 1, _id:0} -> aparece somente o campo
       		{campo: 0}        -> aparece todos menos o campo
       		```
-      	- Para limitarmos a consulta usamos o método limit, exemplo (apenas os 5 primeiros registros): ```db.nomeCollection.find().limit(5)```
-      	- Para ordenarmos a consulta utilizamos o método sort (1 para ordem crescente e -1 para decrescente), exemplo ```db.nomeCollection.find().sort({campo: 1})```
+      	
+	- Para limitarmos a consulta usamos o método limit, exemplo (apenas os 5 primeiros registros): ```db.nomeCollection.find().limit(5)```
+	- Para ordenarmos a consulta utilizamos o método sort (1 para ordem crescente e -1 para decrescente), exemplo: ```db.nomeCollection.find().sort({campo: 1})```
+	- Para sabermos a quantidade de documentos da consulta, exemplo: ```db.nomeCollection.find().count()```
+	- Para fazer uma consulta de um campo com distinct, exemplo:  ```db.nomeCollection.distinct("campo")```
+	- Consultas em strings podemos fazer uma condição perguntando se contém determinada letra ou sequência de letras, exemplo: ```db.nomeCollection.find("campo": /a/)``` -> podemos acrescentar ao final a letra i se quisermos ignorar se é maiúscula ou minúscula ficando: ```db.nomeCollection.find("campo": /a/i)```
 
 	- Operadores:
   	```
@@ -48,6 +52,8 @@
   	$and[{},{}]
   	$or[{},{}]
   	$nor[{},{}]
+
+	campo existe? -> {"campo": {$exists: true}}
 	
   	Para comparar arrays: $all: []
   	```
