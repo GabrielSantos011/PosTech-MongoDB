@@ -56,11 +56,15 @@
 	campo existe? -> {"campo": {$exists: true}}
 	
   	Para comparar arrays: $all: []
+
+   	Para update
+   	$set
+   	$inc   -> incremento
   	```
 
 - Atualizar um único documento: ```db.nomeCollection.updateOne({condição},{$set: {campo: novo valor}})``` (pode ser utilizado para atualizar um campo existente ou criar um novo campo dentro da coleção)
 
-- Atualizar mais de um documento: ```db.nomeCollection.updateMany({"Campo":{$in:["xxxxxxxxxx", "yyyyyyy"]}},{$set: {"Campo": "Novo valor"}})``` 
+- Atualizar mais de um documento: ```db.nomeCollection.updateMany({"Campo":{$in:["xxxxxxxxxx", "yyyyyyy"]}},{$set: {"Campo": "Novo valor"}})```
 
 - Excluir um documento: ```db.db.nomeCollection.deleteOne({condição})```
 
