@@ -6,11 +6,17 @@ import com.fiap.springblog.repository.ArtigoRepository;
 import com.fiap.springblog.repository.AutorRepository;
 import com.fiap.springblog.service.ArtigoService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.OptimisticLockingFailureException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.core.query.Update;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -35,12 +41,14 @@ public class ArtigoServiceImpl implements ArtigoService {
         return this.artigoRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     @Override
     public Artigo obterPorCodigo(String id) {
         return this.artigoRepository.findById(id)
                 .orElseThrow( () -> new IllegalArgumentException("Artigo não existe") );
     }
 
+    @Transactional
     @Override
     public Artigo criar(Artigo artigo) {
         if (artigo.getAutor().getCodigo() != null) {
@@ -51,7 +59,31 @@ public class ArtigoServiceImpl implements ArtigoService {
         } else {
             artigo.setAutor(null);
         }
-        return this.artigoRepository.save(artigo);
+
+        try {
+            return this.artigoRepository.save(artigo);
+        } catch (OptimisticLockingFailureException ex) {
+            //1. recuperar o documento mais recente no banco
+            Artigo atualizado = this.artigoRepository.findById(artigo.getCodigo()).orElse(null);
+
+            if (atualizado != null) {
+                //2. atualizar os campos desejados
+                atualizado.setTitulo(artigo.getTitulo());
+                atualizado.setTexto(artigo.getTexto());
+                atualizado.setAutor(artigo.getAutor());
+                atualizado.setData(artigo.getData());
+                atualizado.setUrl(artigo.getUrl());
+                atualizado.setStatus(artigo.getStatus());
+
+                //3. incrementar a versão
+                atualizado.setVersion(atualizado.getVersion() + 1);
+
+                //4. tentar novamente
+                return this.artigoRepository.save(artigo);
+            } else {
+                throw new RuntimeException("Artigo não encontrado: " + artigo.getCodigo());
+            }
+        }
     }
 
     @Override
@@ -66,6 +98,7 @@ public class ArtigoServiceImpl implements ArtigoService {
         return mongoTemplate.find(query, Artigo.class);
     }
 
+    @Transactional
     @Override
     public void atualiza(Artigo novoArtigo) {
         Artigo artigo = this.artigoRepository.findById(novoArtigo.getCodigo())
@@ -81,6 +114,7 @@ public class ArtigoServiceImpl implements ArtigoService {
         this.artigoRepository.save(artigo);
     }
 
+    @Transactional
     @Override
     public void atualizaSoUrl(String id, String novaUrl) {
         Query query = new Query(Criteria.where("codigo").is(id));
@@ -88,15 +122,52 @@ public class ArtigoServiceImpl implements ArtigoService {
         this.mongoTemplate.updateFirst(query, update, Artigo.class);
     }
 
+    @Transactional
     @Override
     public void delete(String id) {
         this.artigoRepository.deleteById(id);
     }
 
+    @Transactional
     @Override
     public void deleteTemplate(String id) {
         Query query = new Query(Criteria.where("codigo").is(id));
         this.mongoTemplate.remove(query, Artigo.class);
+    }
+
+    @Override
+    public List<Artigo> encontraPorStatusEDataMaiorQue(Integer status, LocalDateTime data) {
+        return this.artigoRepository.findByStatusAndDataGreaterThan(status, data);
+    }
+
+    @Override
+    public List<Artigo> obterArtigoPorDataEHora(LocalDateTime de, LocalDateTime ate) {
+        return this.artigoRepository.obterArtigoPorDataEHora(de, ate);
+    }
+
+    @Override
+    public Page<Artigo> listarTodosPaginado(Pageable pageable) {
+        //paginação nativa do repository
+        return this.artigoRepository.findAll(pageable);
+    }
+
+    @Override
+    public List<Artigo> findByStatusOrderByTituloDesc(Integer status) {
+        return this.artigoRepository.findByStatusOrderByTituloDesc(status);
+    }
+
+    @Override
+    public List<Artigo> obterArtigoPorStatusComOrdenacaoDesc(Integer status) {
+        return this.artigoRepository.obterArtigoPorStatusComOrdenacaoDesc(status);
+    }
+
+    @Override
+    public Page<Artigo> listarTodosPaginadoComOrdenacao(Pageable pageable) {
+        //caso a controller n utilizasse o @pageabledefault poderiamos implementar na mão aqui
+        //Sort sort = Sort.by("titulo").descending();
+        //Pageable paginacao = PageRequest.of(pageable.getPageNumber(), pageable.getPageSize(), sort);
+        //return this.artigoRepository.findAll(paginacao);
+        return this.artigoRepository.findAll(pageable);
     }
 
 }
